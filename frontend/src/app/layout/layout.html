@@ -1,0 +1,76 @@
+<div class="flex h-screen overflow-hidden bg-slate-50">
+
+  <!-- ── Sidebar ── -->
+  <aside class="w-64 flex-shrink-0 bg-slate-900 flex flex-col">
+
+    <!-- Logo -->
+    <div class="h-16 flex items-center px-5 border-b border-slate-800 flex-shrink-0">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
+          <svg class="w-4.5 h-4.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10l2 2h10l2-2zM13 7h3l3 4v2h-6V7z"/>
+          </svg>
+        </div>
+        <span class="text-white font-bold text-lg tracking-tight">DistribERP</span>
+      </div>
+    </div>
+
+    <!-- Nav -->
+    <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
+      @for (item of visibleNav(); track item.path) {
+        <a [routerLink]="item.path"
+           routerLinkActive="bg-slate-700 text-white"
+           [routerLinkActiveOptions]="{exact: item.path === '/dashboard'}"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors text-sm font-medium">
+          <span class="w-1.5 h-1.5 rounded-full bg-current opacity-60"></span>
+          {{ item.label }}
+        </a>
+      }
+    </nav>
+
+    <!-- User -->
+    <div class="border-t border-slate-800 p-4 flex-shrink-0">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-9 h-9 rounded-full bg-orange-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+          {{ userInitial }}
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-white text-sm font-medium truncate">{{ auth.username() }}</p>
+          <p class="text-slate-500 text-xs">{{ auth.roles()[0] }}</p>
+        </div>
+      </div>
+      <button (click)="auth.logout()"
+              class="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-slate-800 transition-colors text-sm cursor-pointer">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+        </svg>
+        Sign out
+      </button>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+
+    <!-- Topbar -->
+    <header class="h-16 flex-shrink-0 bg-white border-b border-slate-200 flex items-center justify-between px-6">
+      <h1 class="text-xl font-bold text-slate-900">{{ pageTitle() }}</h1>
+      <div class="flex items-center gap-2">
+        @for (role of auth.roles().slice(0, 2); track role) {
+          <app-badge [value]="role" />
+        }
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="flex-1 overflow-auto p-6">
+      <router-outlet />
+    </main>
+  </div>
+</div>
+
+<app-toast />

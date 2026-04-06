@@ -1,0 +1,210 @@
+<div class="space-y-5">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-xl font-bold text-slate-900">Orders</h2>
+      <p class="text-slate-500 text-sm mt-0.5">Manage customer orders</p>
+    </div>
+    <button (click)="openCreate()"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors cursor-pointer">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      Place Order
+    </button>
+  </div>
+
+  <!-- Table -->
+  <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+    @if (loading()) {
+      <div class="flex items-center justify-center py-16">
+        <div class="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    } @else if (items().length === 0) {
+      <div class="text-center py-16 text-slate-400 text-sm">No orders found.</div>
+    } @else {
+      <table class="w-full text-sm">
+        <thead class="bg-slate-50 border-b border-slate-200">
+          <tr>
+            <th class="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">#</th>
+            <th class="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Client</th>
+            <th class="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Merchant</th>
+            <th class="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Total</th>
+            <th class="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Payment</th>
+            <th class="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+            <th class="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Date</th>
+            <th class="px-4 py-3"></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          @for (item of items(); track item.id) {
+            <tr class="hover:bg-slate-50 transition-colors">
+              <td class="px-4 py-3 font-mono text-xs text-slate-500">{{ item.orderNumber }}</td>
+              <td class="px-4 py-3 font-medium text-slate-900">{{ clientName(item.clientId) }}</td>
+              <td class="px-4 py-3 text-slate-600">{{ merchantName(item.merchantId) }}</td>
+              <td class="px-4 py-3 font-medium text-slate-900">${{ item.totalAmount | number:'1.2-2' }}</td>
+              <td class="px-4 py-3"><app-badge [value]="item.paymentMethod" /></td>
+              <td class="px-4 py-3"><app-badge [value]="item.status" /></td>
+              <td class="px-4 py-3 text-slate-500 text-xs">{{ item.orderDate | date:'mediumDate' }}</td>
+              <td class="px-4 py-3 text-right">
+                @if (item.status === 'DRAFT') {
+                  <button (click)="openStatus(item.id)"
+                          class="px-3 py-1.5 text-xs font-medium text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 cursor-pointer">Update Status</button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>
+
+<!-- Create Order Modal -->
+@if (showModal()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/40" (click)="close()"></div>
+    <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between p-5 border-b border-slate-200">
+        <h3 class="text-base font-semibold text-slate-900">Place New Order</h3>
+        <button (click)="close()" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="save()" class="p-5 space-y-5">
+
+        <!-- Order Info -->
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">Client *</label>
+            <select formControlName="clientId"
+                    class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    [class.border-red-400]="err('clientId')">
+              <option [ngValue]="null">Select client…</option>
+              @for (c of clients(); track c.id) {
+                <option [ngValue]="c.id">{{ c.fullName }}</option>
+              }
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">Merchant *</label>
+            <select formControlName="merchantId"
+                    class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    [class.border-red-400]="err('merchantId')">
+              <option [ngValue]="null">Select merchant…</option>
+              @for (m of merchants(); track m.id) {
+                <option [ngValue]="m.id">{{ m.storeName }}</option>
+              }
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">Payment Method *</label>
+            <select formControlName="paymentMethod"
+                    class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="PREPAID">Prepaid</option>
+              <option value="COD">Cash on Delivery</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">COD Amount</label>
+            <input formControlName="codAmount" type="number" step="0.01" placeholder="0.00"
+                   class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+        </div>
+
+        <!-- Order Items -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Order Items</label>
+            <button type="button" (click)="addItem()"
+                    class="text-xs font-medium text-blue-600 hover:text-blue-700 cursor-pointer">+ Add Item</button>
+          </div>
+          <div class="space-y-3" formArrayName="items">
+            @for (item of itemsArray.controls; track $index; let i = $index) {
+              <div [formGroupName]="i" class="grid grid-cols-12 gap-2 items-end bg-slate-50 rounded-lg p-3">
+                <div class="col-span-4">
+                  <label class="block text-xs text-slate-500 mb-1">Product</label>
+                  <select formControlName="productId" (change)="onProductChange(i)"
+                          class="w-full px-2 py-1.5 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option [ngValue]="null">Select…</option>
+                    @for (p of products(); track p.id) {
+                      <option [ngValue]="p.id">{{ p.name }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="col-span-2">
+                  <label class="block text-xs text-slate-500 mb-1">Qty</label>
+                  <input formControlName="quantity" type="number" min="1"
+                         class="w-full px-2 py-1.5 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="col-span-3">
+                  <label class="block text-xs text-slate-500 mb-1">Unit Price</label>
+                  <input formControlName="unitPrice" type="number" step="0.01"
+                         class="w-full px-2 py-1.5 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="col-span-2">
+                  <label class="block text-xs text-slate-500 mb-1">Discount</label>
+                  <input formControlName="discount" type="number" step="0.01"
+                         class="w-full px-2 py-1.5 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="col-span-1 flex justify-end">
+                  <button type="button" (click)="removeItem(i)"
+                          class="w-7 h-7 flex items-center justify-center text-red-400 hover:text-red-600 cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-2">
+          <button type="button" (click)="close()"
+                  class="px-4 py-2 text-sm font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer">Cancel</button>
+          <button type="submit"
+                  class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 cursor-pointer">Place Order</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Update Status Modal -->
+@if (showStatusModal()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/40" (click)="closeStatus()"></div>
+    <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-sm">
+      <div class="flex items-center justify-between p-5 border-b border-slate-200">
+        <h3 class="text-base font-semibold text-slate-900">Update Order Status</h3>
+        <button (click)="closeStatus()" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <form [formGroup]="statusForm" (ngSubmit)="saveStatus()" class="p-5 space-y-4">
+        <div>
+          <label class="block text-xs font-medium text-slate-700 mb-1">New Status</label>
+          <select formControlName="status"
+                  class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">Select status…</option>
+            @for (s of statuses; track s) {
+              <option [value]="s">{{ s }}</option>
+            }
+          </select>
+        </div>
+        <div class="flex justify-end gap-3">
+          <button type="button" (click)="closeStatus()"
+                  class="px-4 py-2 text-sm font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer">Cancel</button>
+          <button type="submit"
+                  class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 cursor-pointer">Update</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
