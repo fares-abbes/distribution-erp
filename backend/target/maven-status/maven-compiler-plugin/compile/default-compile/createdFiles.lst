@@ -1,0 +1,9 @@
+distribution\demo\Entities\Product.class
+distribution\demo\Enums\productType.class
+distribution\demo\Entities\User.class
+distribution\demo\Enums\UserRole.class
+distribution\demo\Security\KeycloakRoleConverter.class
+distribution\demo\Security\SecurityConfig.class
+distribution\demo\DemoApplication.class
+distribution\demo\Entities\Client.class
+distribution\demo\Entities\Merchant.class
