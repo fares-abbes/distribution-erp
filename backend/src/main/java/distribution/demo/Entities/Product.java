@@ -1,9 +1,10 @@
 package distribution.demo.Entities;
 
-import distribution.demo.Enums.productType;
 import jakarta.persistence.*;
 import lombok.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Transient;
 import distribution.demo.Entities.*;
 
 import java.math.BigDecimal;
@@ -31,8 +32,7 @@ public class Product {
     @Column(length = 1000)
     private String description;
 
-    @Enumerated(EnumType.STRING)
-    private productType type;
+    private String type;
 
     private BigDecimal purchasePrice;
     private BigDecimal salePrice;
@@ -40,15 +40,23 @@ public class Product {
     private Double volume;
     private String dimensions;
 
-    private Integer stockQuantity;
     private Integer minStockLevel;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "merchant_id")
-    @JsonIgnore
+    @Getter(onMethod_ = {@JsonIgnore})
     private Merchant merchant;
 
     private BigDecimal declaredValue;
     private boolean isFragile = false;
     private boolean active = true;
+
+    @Column(length = 2048)
+    private String imageUrl;
+
+    @Transient
+    @JsonProperty("merchantId")
+    public Long getMerchantId() {
+        return merchant != null ? merchant.getId() : null;
+    }
 }

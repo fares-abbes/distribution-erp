@@ -1,5 +1,6 @@
 package distribution.demo.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import distribution.demo.Enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
@@ -33,10 +34,30 @@ public class User {
     @Column(nullable = false)
     private UserRole role;
 
-    // Optional: If this user is a Merchant, link it to their merchant record
+    // Keycloak user UUID — kept in sync with Keycloak
+    private String keycloakId;
+
+    // Optional: link to Merchant record (for MERCHANT role)
+    @Getter(onMethod_ = {@JsonIgnore})
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "merchant_record_id")
     private Merchant merchantRecord;
 
+    // Optional: link to Rider record (for RIDER role)
+    @Getter(onMethod_ = {@JsonIgnore})
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rider_record_id")
+    private Rider riderRecord;
+
     private boolean active = true;
+
+    @Transient
+    public Long getMerchantRecordId() {
+        return merchantRecord != null ? merchantRecord.getId() : null;
+    }
+
+    @Transient
+    public Long getRiderRecordId() {
+        return riderRecord != null ? riderRecord.getId() : null;
+    }
 }

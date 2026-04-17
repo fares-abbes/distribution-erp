@@ -73,10 +73,10 @@ public class ProductService {
         product.setWeight(dto.getWeight());
         product.setVolume(dto.getVolume());
         product.setDimensions(dto.getDimensions());
-        product.setStockQuantity(dto.getStockQuantity());
         product.setMinStockLevel(dto.getMinStockLevel());
         product.setDeclaredValue(dto.getDeclaredValue());
         product.setFragile(dto.isFragile());
+        product.setImageUrl(dto.getImageUrl());
         if (dto.getMerchantId() != null) {
             Merchant merchant = new Merchant();
             merchant.setId(dto.getMerchantId());

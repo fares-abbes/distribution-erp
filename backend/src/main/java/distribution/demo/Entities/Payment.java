@@ -1,6 +1,7 @@
 package distribution.demo.Entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Transient;
 import distribution.demo.Enums.PaymentMethod;
 import distribution.demo.Enums.PaymentStatus;
 import jakarta.persistence.*;
@@ -37,20 +38,22 @@ public class Payment {
     @Column(nullable = false)
     private PaymentStatus status;
 
+    @Getter(onMethod_ = {@JsonIgnore})
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "merchant_id", nullable = false)
-    @JsonIgnore
     private Merchant merchant;
 
+    @Getter(onMethod_ = {@JsonIgnore})
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
-    @JsonIgnore
     private Order order;
 
+    @Transient
     public Long getMerchantId() {
         return merchant != null ? merchant.getId() : null;
     }
 
+    @Transient
     public Long getOrderId() {
         return order != null ? order.getId() : null;
     }

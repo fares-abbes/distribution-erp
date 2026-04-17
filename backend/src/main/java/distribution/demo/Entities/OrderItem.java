@@ -1,6 +1,8 @@
 package distribution.demo.Entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,6 +28,7 @@ public class OrderItem {
 
     private BigDecimal discount;
 
+    @Getter(onMethod_ = {@JsonIgnore})
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
@@ -34,4 +37,10 @@ public class OrderItem {
     @JoinColumn(name = "order_id", nullable = false)
     @JsonBackReference("order-items")
     private Order order;
+
+    @Transient
+    @JsonProperty("productId")
+    public Long getProductId() {
+        return product != null ? product.getId() : null;
+    }
 }

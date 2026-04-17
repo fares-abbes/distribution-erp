@@ -4,12 +4,11 @@ import { DecimalPipe } from '@angular/common';
 import { ZoneService } from '../../core/services/zone.service';
 import { ToastService } from '../../shared/toast.service';
 import { Zone } from '../../core/models';
-import { BadgeComponent } from '../../shared/badge';
 
 @Component({
   selector: 'app-zones',
   standalone: true,
-  imports: [ReactiveFormsModule, BadgeComponent, DecimalPipe],
+  imports: [ReactiveFormsModule, DecimalPipe],
   templateUrl: './zones.html',
 })
 export class ZonesComponent implements OnInit {

@@ -32,9 +32,9 @@ public class Client {
     private String landmark; // Helpful for local deliveries (e.g. "Near the blue mosque")
 
     // The Merchant who "owns" this client relationship
+    @Getter(onMethod_ = {@JsonIgnore})
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "merchant_id")
-    @JsonIgnore
     private Merchant merchant;
 
     private boolean active = true;

@@ -43,9 +43,13 @@ export class AuthService {
   }
 
   async refreshToken(): Promise<void> {
-    const refreshed = await this.keycloak.updateToken(30);
-    if (refreshed) {
-      this.username.set(this.keycloak.tokenParsed?.['preferred_username'] ?? '');
+    try {
+      const refreshed = await this.keycloak.updateToken(60);
+      if (refreshed) {
+        this.username.set(this.keycloak.tokenParsed?.['preferred_username'] ?? '');
+      }
+    } catch {
+      this.login();
     }
   }
 

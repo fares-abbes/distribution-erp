@@ -2,7 +2,9 @@ package distribution.demo.Services;
 
 import distribution.demo.Dtos.RiderDto;
 import distribution.demo.Entities.Rider;
+import distribution.demo.Entities.Vehicle;
 import distribution.demo.Repositories.RiderRepository;
+import distribution.demo.Repositories.VehicleRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,9 +16,12 @@ import java.util.List;
 public class RiderService {
 
     private final RiderRepository riderRepository;
+    private final VehicleRepository vehicleRepository;
 
-    public RiderService(RiderRepository riderRepository) {
+    public RiderService(RiderRepository riderRepository,
+                        VehicleRepository vehicleRepository) {
         this.riderRepository = riderRepository;
+        this.vehicleRepository = vehicleRepository;
     }
 
     public List<Rider> getAllRiders() {
@@ -33,7 +38,7 @@ public class RiderService {
         Rider rider = new Rider();
         rider.setName(dto.getName());
         rider.setPhone(dto.getPhone());
-        rider.setVehicleType(dto.getVehicleType());
+        rider.setVehicle(resolveVehicle(dto.getVehicleId()));
         return riderRepository.save(rider);
     }
 
@@ -41,7 +46,7 @@ public class RiderService {
         Rider rider = getRiderById(id);
         rider.setName(dto.getName());
         rider.setPhone(dto.getPhone());
-        rider.setVehicleType(dto.getVehicleType());
+        rider.setVehicle(resolveVehicle(dto.getVehicleId()));
         return riderRepository.save(rider);
     }
 
@@ -49,5 +54,12 @@ public class RiderService {
         Rider rider = getRiderById(id);
         rider.setActive(false);
         riderRepository.save(rider);
+    }
+
+    private Vehicle resolveVehicle(Long vehicleId) {
+        if (vehicleId == null) return null;
+        return vehicleRepository.findById(vehicleId)
+                .filter(Vehicle::isActive)
+                .orElseThrow(() -> new EntityNotFoundException("Vehicle not found: " + vehicleId));
     }
 }

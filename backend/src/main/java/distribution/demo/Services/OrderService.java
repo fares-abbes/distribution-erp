@@ -31,17 +31,23 @@ public class OrderService {
     private final ShipmentRepository shipmentRepository;
     private final UserRepository userRepository;
     private final ZoneRepository zoneRepository;
+    private final WarehouseRepository warehouseRepository;
+    private final InventoryService inventoryService;
 
     public OrderService(OrderRepository orderRepository,
                         ProductRepository productRepository,
                         ShipmentRepository shipmentRepository,
                         UserRepository userRepository,
-                        ZoneRepository zoneRepository) {
+                        ZoneRepository zoneRepository,
+                        WarehouseRepository warehouseRepository,
+                        InventoryService inventoryService) {
         this.orderRepository = orderRepository;
         this.productRepository = productRepository;
         this.shipmentRepository = shipmentRepository;
         this.userRepository = userRepository;
         this.zoneRepository = zoneRepository;
+        this.warehouseRepository = warehouseRepository;
+        this.inventoryService = inventoryService;
     }
 
     public Order getOrderById(Long id) {
@@ -60,14 +66,18 @@ public class OrderService {
     public Order placeOrder(OrderDto dto) {
         verifyMerchantAccess(dto.getMerchantId());
 
+        Long warehouseId = dto.getWarehouseId();
         for (OrderItemDto itemDto : dto.getItems()) {
             Product product = productRepository.findById(itemDto.getProductId())
                     .filter(Product::isActive)
                     .orElseThrow(() -> new EntityNotFoundException("Product not found with id: " + itemDto.getProductId()));
-            if (product.getStockQuantity() < itemDto.getQuantity()) {
+            int available = warehouseId != null
+                    ? inventoryService.getStockByProductAndWarehouse(product.getId(), warehouseId).getQuantity()
+                    : inventoryService.getTotalStock(product.getId());
+            if (available < itemDto.getQuantity()) {
                 throw new InsufficientStockException(
                         "Insufficient stock for product '" + product.getName() + "'. " +
-                        "Available: " + product.getStockQuantity() + ", Requested: " + itemDto.getQuantity());
+                        "Available: " + available + ", Requested: " + itemDto.getQuantity());
             }
         }
 
@@ -86,13 +96,17 @@ public class OrderService {
         merchant.setId(dto.getMerchantId());
         order.setMerchant(merchant);
 
+        if (dto.getWarehouseId() != null) {
+            warehouseRepository.findByIdAndActiveTrue(dto.getWarehouseId())
+                    .ifPresent(order::setWarehouse);
+        }
+
         List<OrderItem> items = new ArrayList<>();
         BigDecimal total = BigDecimal.ZERO;
 
         for (OrderItemDto itemDto : dto.getItems()) {
             Product product = productRepository.findById(itemDto.getProductId()).get();
-            product.setStockQuantity(product.getStockQuantity() - itemDto.getQuantity());
-            productRepository.save(product);
+            inventoryService.deductStockForOrder(product.getId(), itemDto.getQuantity(), warehouseId);
 
             OrderItem item = new OrderItem();
             item.setProduct(product);
@@ -156,15 +170,13 @@ public class OrderService {
             }
         }
 
-        String pickupAddress = null;
         String deliveryAddress = null;
-        try { pickupAddress = order.getMerchant().getAddress(); } catch (Exception ignored) {}
         try { deliveryAddress = order.getClient().getAddress(); } catch (Exception ignored) {}
 
         Shipment shipment = new Shipment();
         shipment.setTrackingNumber("TRK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
         shipment.setCurrentStatus(ShipmentStatus.READY_FOR_PICKUP);
-        shipment.setPickupAddress(pickupAddress);
+        shipment.setPickupWarehouse(order.getWarehouse());
         shipment.setDeliveryAddress(deliveryAddress);
         shipment.setShippingCost(BigDecimal.valueOf(shippingCost));
         shipment.setOrder(order);
@@ -174,9 +186,7 @@ public class OrderService {
 
     private void restoreStock(Order order) {
         for (OrderItem item : order.getOrderItems()) {
-            Product product = item.getProduct();
-            product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
-            productRepository.save(product);
+            inventoryService.restoreStock(item.getProduct().getId(), item.getQuantity());
         }
     }
 

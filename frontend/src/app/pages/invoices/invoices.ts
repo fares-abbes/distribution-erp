@@ -5,12 +5,11 @@ import { InvoiceService } from '../../core/services/invoice.service';
 import { MerchantService } from '../../core/services/merchant.service';
 import { ToastService } from '../../shared/toast.service';
 import { Invoice, Merchant, InvoiceStatus } from '../../core/models';
-import { BadgeComponent } from '../../shared/badge';
 
 @Component({
   selector: 'app-invoices',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, BadgeComponent, DatePipe, DecimalPipe],
+  imports: [ReactiveFormsModule, CommonModule, DatePipe, DecimalPipe],
   templateUrl: './invoices.html',
 })
 export class InvoicesComponent implements OnInit {

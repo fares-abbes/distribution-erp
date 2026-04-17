@@ -1,3 +1,4 @@
+export type VehicleType = 'MOTORCYCLE' | 'CAR' | 'VAN' | 'BICYCLE' | 'TRUCK';
 export type OrderStatus = 'DRAFT' | 'CONFIRMED' | 'CANCELLED';
 export type ShipmentStatus = 'READY_FOR_PICKUP' | 'PENDING' | 'IN_TRANSIT' | 'DELIVERED' | 'RETURNED';
 export type OrderPaymentMethod = 'PREPAID' | 'COD';
@@ -45,11 +46,37 @@ export interface Product {
   weight?: number;
   volume?: number;
   dimensions?: string;
-  stockQuantity: number;
   minStockLevel?: number;
   merchantId?: number;
   declaredValue?: number;
   fragile: boolean;
+  active: boolean;
+  imageUrl?: string;
+}
+
+export interface Warehouse {
+  id: number;
+  name: string;
+  city: string;
+  address?: string;
+  active: boolean;
+}
+
+export interface WarehouseInventory {
+  id: number;
+  productId: number;
+  warehouseId: number;
+  quantity: number;
+  lastUpdated?: string;
+}
+
+export interface Vehicle {
+  id: number;
+  plateNumber: string;
+  type: VehicleType;
+  brand?: string;
+  model?: string;
+  year?: number;
   active: boolean;
 }
 
@@ -57,7 +84,8 @@ export interface Rider {
   id: number;
   name: string;
   phone: string;
-  vehicleType?: string;
+  vehicleId?: number;
+  vehicle?: Vehicle;
   active: boolean;
 }
 
@@ -103,12 +131,14 @@ export interface Shipment {
   id: number;
   trackingNumber: string;
   currentStatus: ShipmentStatus;
-  pickupAddress?: string;
+  pickupWarehouseId?: number;
+  pickupWarehouseName?: string;
   deliveryAddress?: string;
   shippingCost?: number;
   orderId?: number;
-  rider?: Rider;
-  zone?: Zone;
+  riderId?: number;
+  riderName?: string;
+  zoneId?: number;
   statusLogs: StatusLog[];
 }
 
@@ -154,5 +184,30 @@ export interface User {
   phoneNumber?: string;
   role: UserRole;
   merchantRecordId?: number;
+  riderRecordId?: number;
+  keycloakId?: string;
   active: boolean;
+}
+
+export interface DailyRevenue {
+  date: string;
+  revenue: number;
+}
+
+export interface DashboardStats {
+  totalMerchants: number;
+  totalProducts: number;
+  totalClients: number;
+  totalRiders: number;
+  totalOrders: number;
+  totalRevenue: number;
+  draftOrders: number;
+  confirmedOrders: number;
+  cancelledOrders: number;
+  readyForPickupShipments: number;
+  pendingShipments: number;
+  inTransitShipments: number;
+  deliveredShipments: number;
+  returnedShipments: number;
+  revenueLastMonth: DailyRevenue[];
 }

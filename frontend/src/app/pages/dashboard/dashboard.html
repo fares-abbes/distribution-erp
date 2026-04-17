@@ -1,64 +1,267 @@
-<div class="space-y-6">
+<div class="nf-dashboard nf-stagger">
 
-  <!-- Welcome -->
-  <div class="bg-gradient-to-r from-slate-900 to-slate-700 rounded-2xl p-6 text-white">
-    <p class="text-slate-400 text-sm mb-1">Good day,</p>
-    <h2 class="text-2xl font-bold mb-1">{{ auth.username() }}</h2>
-    <p class="text-slate-400 text-sm">Here's what's happening in your distribution network today.</p>
-  </div>
-
-  <!-- Stats -->
-  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-    <div class="bg-white rounded-xl border border-slate-200 p-5">
-      <p class="text-slate-500 text-xs font-medium uppercase tracking-wider mb-2">Merchants</p>
-      <p class="text-3xl font-bold text-slate-900">{{ merchants() }}</p>
-      <a routerLink="/merchants" class="text-blue-600 text-xs mt-2 inline-block hover:underline">View all →</a>
+  <!-- ── Hero Welcome ── -->
+  <div class="nf-hero nf-fade-in">
+    <div class="nf-hero__content">
+      <p class="nf-hero__greeting">Real-time logistics flow</p>
+      <h2 class="nf-hero__title">Welcome back, {{ auth.username() }}</h2>
+      <p class="nf-hero__subtitle">Here's your distribution network pulse for today.</p>
     </div>
-    <div class="bg-white rounded-xl border border-slate-200 p-5">
-      <p class="text-slate-500 text-xs font-medium uppercase tracking-wider mb-2">Products</p>
-      <p class="text-3xl font-bold text-slate-900">{{ products() }}</p>
-      <a routerLink="/products" class="text-blue-600 text-xs mt-2 inline-block hover:underline">View all →</a>
-    </div>
-    <div class="bg-white rounded-xl border border-slate-200 p-5">
-      <p class="text-slate-500 text-xs font-medium uppercase tracking-wider mb-2">Clients</p>
-      <p class="text-3xl font-bold text-slate-900">{{ clients() }}</p>
-      <a routerLink="/clients" class="text-blue-600 text-xs mt-2 inline-block hover:underline">View all →</a>
-    </div>
-    <div class="bg-white rounded-xl border border-slate-200 p-5">
-      <p class="text-slate-500 text-xs font-medium uppercase tracking-wider mb-2">Riders</p>
-      <p class="text-3xl font-bold text-slate-900">{{ riders() }}</p>
-      <a routerLink="/riders" class="text-blue-600 text-xs mt-2 inline-block hover:underline">View all →</a>
+    <div class="nf-hero__indicators">
+      <div class="nf-hero__indicator">
+        <span class="material-icons-round" style="font-size: 16px; color: var(--tertiary);">trending_up</span>
+        <span class="nf-hero__indicator-text">Exceeding daily projection</span>
+      </div>
+      <div class="nf-hero__indicator">
+        <span class="material-icons-round" style="font-size: 16px; color: var(--primary);">bolt</span>
+        <span class="nf-hero__indicator-text">Peak demand coverage active</span>
+      </div>
     </div>
   </div>
 
+  <!-- ── KPI Cards (Admin / Manager only) ── -->
   @if (auth.hasRole('ADMIN') || auth.hasRole('MANAGER')) {
-    <div class="bg-white rounded-xl border border-slate-200 p-5 w-fit">
-      <p class="text-slate-500 text-xs font-medium uppercase tracking-wider mb-2">Total Orders</p>
-      <p class="text-3xl font-bold text-slate-900">{{ orders() }}</p>
-      <a routerLink="/orders" class="text-blue-600 text-xs mt-2 inline-block hover:underline">View all →</a>
-    </div>
+    @if (loadingStats()) {
+      <div style="display: flex; align-items: center; gap: 10px; color: var(--on-surface-variant); font-size: 0.875rem;">
+        <div class="nf-loading-pulse"><span></span><span></span><span></span></div>
+        Loading analytics…
+      </div>
+    } @else if (stats()) {
+      <!-- Revenue + delivery KPIs -->
+      <div class="nf-kpi-grid nf-stagger">
+        <div class="nf-kpi-card nf-fade-in">
+          <div class="nf-kpi-card__glow nf-kpi-card__glow--tertiary"></div>
+          <div class="nf-kpi-card__label">
+            <span class="material-icons-round">payments</span>
+            Total Revenue
+          </div>
+          <div class="nf-kpi-card__value nf-kpi-card__value--revenue">
+            {{ formatRevenue(stats()!.totalRevenue) }}
+          </div>
+          <div class="nf-kpi-card__sub">From confirmed orders</div>
+        </div>
+
+        <div class="nf-kpi-card nf-fade-in">
+          <div class="nf-kpi-card__glow nf-kpi-card__glow--primary"></div>
+          <div class="nf-kpi-card__label">
+            <span class="material-icons-round">local_shipping</span>
+            In Transit
+          </div>
+          <div class="nf-kpi-card__value">{{ stats()!.inTransitShipments }}</div>
+          <div class="nf-kpi-card__sub">Active deliveries</div>
+        </div>
+
+        <div class="nf-kpi-card nf-fade-in">
+          <div class="nf-kpi-card__glow nf-kpi-card__glow--tertiary"></div>
+          <div class="nf-kpi-card__label">
+            <span class="material-icons-round">check_circle</span>
+            Delivered
+          </div>
+          <div class="nf-kpi-card__value" style="color: var(--tertiary);">{{ stats()!.deliveredShipments }}</div>
+          <div class="nf-kpi-card__sub">Successfully completed</div>
+        </div>
+
+        <div class="nf-kpi-card nf-fade-in">
+          <div class="nf-kpi-card__glow nf-kpi-card__glow--primary"></div>
+          <div class="nf-kpi-card__label">
+            <span class="material-icons-round">shopping_cart</span>
+            Total Orders
+          </div>
+          <div class="nf-kpi-card__value">{{ stats()!.totalOrders }}</div>
+          <div class="nf-kpi-card__sub">All statuses combined</div>
+        </div>
+
+        <div class="nf-kpi-card nf-fade-in">
+          <div class="nf-kpi-card__glow nf-kpi-card__glow--primary"></div>
+          <div class="nf-kpi-card__label">
+            <span class="material-icons-round">assignment_return</span>
+            Returned
+          </div>
+          <div class="nf-kpi-card__value" style="color: #ff6b6b;">{{ stats()!.returnedShipments }}</div>
+          <div class="nf-kpi-card__sub">Return rate: {{ shipmentsPct(stats()!.returnedShipments) }}%</div>
+        </div>
+
+        <div class="nf-kpi-card nf-fade-in">
+          <div class="nf-kpi-card__glow nf-kpi-card__glow--primary"></div>
+          <div class="nf-kpi-card__label">
+            <span class="material-icons-round">pending_actions</span>
+            Confirmed Orders
+          </div>
+          <div class="nf-kpi-card__value" style="color: var(--primary);">{{ stats()!.confirmedOrders }}</div>
+          <div class="nf-kpi-card__sub">Ready for shipment</div>
+        </div>
+      </div>
+
+      <!-- Revenue Trend -->
+      <div class="nf-revenue-card nf-fade-in">
+        <div class="nf-revenue-card__header">
+          <div>
+            <div class="nf-revenue-card__title">Revenue Trend</div>
+            <div class="nf-revenue-card__sub">Last 30 days — confirmed orders</div>
+          </div>
+          <div class="nf-revenue-card__total">{{ formatRevenue(stats()!.totalRevenue) }}</div>
+        </div>
+        <div class="nf-bar-chart">
+          @for (day of stats()!.revenueLastMonth; track day.date) {
+            <div
+              class="nf-bar"
+              [class.nf-bar--has-data]="day.revenue > 0"
+              [style.height.%]="barHeight(day.revenue)"
+              [title]="day.date + ': ' + day.revenue"
+            ></div>
+          }
+        </div>
+      </div>
+
+      <!-- Status Breakdowns -->
+      <div class="nf-analytics-row nf-stagger">
+        <!-- Orders by status -->
+        <div class="nf-analytics-card nf-fade-in">
+          <div class="nf-analytics-card__title">Orders by Status</div>
+          <div class="nf-status-list">
+            <div class="nf-status-row">
+              <span class="nf-status-row__label">Draft</span>
+              <div class="nf-status-bar-track">
+                <div class="nf-status-bar-fill nf-status-bar-fill--draft"
+                     [style.width.%]="ordersPct(stats()!.draftOrders)"></div>
+              </div>
+              <span class="nf-status-row__count">{{ stats()!.draftOrders }}</span>
+            </div>
+            <div class="nf-status-row">
+              <span class="nf-status-row__label">Confirmed</span>
+              <div class="nf-status-bar-track">
+                <div class="nf-status-bar-fill nf-status-bar-fill--confirmed"
+                     [style.width.%]="ordersPct(stats()!.confirmedOrders)"></div>
+              </div>
+              <span class="nf-status-row__count">{{ stats()!.confirmedOrders }}</span>
+            </div>
+            <div class="nf-status-row">
+              <span class="nf-status-row__label">Cancelled</span>
+              <div class="nf-status-bar-track">
+                <div class="nf-status-bar-fill nf-status-bar-fill--cancelled"
+                     [style.width.%]="ordersPct(stats()!.cancelledOrders)"></div>
+              </div>
+              <span class="nf-status-row__count">{{ stats()!.cancelledOrders }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Shipments by status -->
+        <div class="nf-analytics-card nf-fade-in">
+          <div class="nf-analytics-card__title">Shipments by Status</div>
+          <div class="nf-status-list">
+            <div class="nf-status-row">
+              <span class="nf-status-row__label">Ready for Pickup</span>
+              <div class="nf-status-bar-track">
+                <div class="nf-status-bar-fill nf-status-bar-fill--pickup"
+                     [style.width.%]="shipmentsPct(stats()!.readyForPickupShipments)"></div>
+              </div>
+              <span class="nf-status-row__count">{{ stats()!.readyForPickupShipments }}</span>
+            </div>
+            <div class="nf-status-row">
+              <span class="nf-status-row__label">Pending</span>
+              <div class="nf-status-bar-track">
+                <div class="nf-status-bar-fill nf-status-bar-fill--pending"
+                     [style.width.%]="shipmentsPct(stats()!.pendingShipments)"></div>
+              </div>
+              <span class="nf-status-row__count">{{ stats()!.pendingShipments }}</span>
+            </div>
+            <div class="nf-status-row">
+              <span class="nf-status-row__label">In Transit</span>
+              <div class="nf-status-bar-track">
+                <div class="nf-status-bar-fill nf-status-bar-fill--transit"
+                     [style.width.%]="shipmentsPct(stats()!.inTransitShipments)"></div>
+              </div>
+              <span class="nf-status-row__count">{{ stats()!.inTransitShipments }}</span>
+            </div>
+            <div class="nf-status-row">
+              <span class="nf-status-row__label">Delivered</span>
+              <div class="nf-status-bar-track">
+                <div class="nf-status-bar-fill nf-status-bar-fill--delivered"
+                     [style.width.%]="shipmentsPct(stats()!.deliveredShipments)"></div>
+              </div>
+              <span class="nf-status-row__count">{{ stats()!.deliveredShipments }}</span>
+            </div>
+            <div class="nf-status-row">
+              <span class="nf-status-row__label">Returned</span>
+              <div class="nf-status-bar-track">
+                <div class="nf-status-bar-fill nf-status-bar-fill--returned"
+                     [style.width.%]="shipmentsPct(stats()!.returnedShipments)"></div>
+              </div>
+              <span class="nf-status-row__count">{{ stats()!.returnedShipments }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
   }
 
-  <!-- Quick links -->
-  <div>
-    <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Quick Actions</h3>
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-      <a routerLink="/orders" class="bg-white border border-slate-200 rounded-xl p-4 hover:border-blue-300 hover:shadow-sm transition-all text-center">
-        <p class="text-slate-900 font-semibold text-sm">New Order</p>
-        <p class="text-slate-400 text-xs mt-0.5">Place an order</p>
+  <!-- ── Entity Count Cards (visible to all roles) ── -->
+  <div class="nf-section nf-fade-in">
+    @if (auth.hasRole('ADMIN') || auth.hasRole('MANAGER')) {
+      <h3 class="nf-section__title">Network Overview</h3>
+    }
+    <div class="nf-telemetry-grid nf-stagger">
+      <a routerLink="/merchants" class="nf-telemetry-card nf-fade-in">
+        <div class="nf-telemetry-card__header">
+          <span class="material-icons-round nf-telemetry-card__icon">storefront</span>
+          <span class="nf-telemetry-card__label">MERCHANTS</span>
+        </div>
+        <p class="nf-telemetry-card__value">{{ merchants() }}</p>
+        <span class="nf-telemetry-card__link">View all →</span>
       </a>
-      <a routerLink="/shipments" class="bg-white border border-slate-200 rounded-xl p-4 hover:border-blue-300 hover:shadow-sm transition-all text-center">
-        <p class="text-slate-900 font-semibold text-sm">Shipments</p>
-        <p class="text-slate-400 text-xs mt-0.5">Track deliveries</p>
+      <a routerLink="/products" class="nf-telemetry-card nf-fade-in">
+        <div class="nf-telemetry-card__header">
+          <span class="material-icons-round nf-telemetry-card__icon">inventory_2</span>
+          <span class="nf-telemetry-card__label">PRODUCTS</span>
+        </div>
+        <p class="nf-telemetry-card__value">{{ products() }}</p>
+        <span class="nf-telemetry-card__link">View all →</span>
       </a>
-      <a routerLink="/returns" class="bg-white border border-slate-200 rounded-xl p-4 hover:border-blue-300 hover:shadow-sm transition-all text-center">
-        <p class="text-slate-900 font-semibold text-sm">Returns</p>
-        <p class="text-slate-400 text-xs mt-0.5">Manage returns</p>
+      <a routerLink="/clients" class="nf-telemetry-card nf-fade-in">
+        <div class="nf-telemetry-card__header">
+          <span class="material-icons-round nf-telemetry-card__icon">people</span>
+          <span class="nf-telemetry-card__label">CLIENTS</span>
+        </div>
+        <p class="nf-telemetry-card__value">{{ clients() }}</p>
+        <span class="nf-telemetry-card__link">View all →</span>
       </a>
-      <a routerLink="/invoices" class="bg-white border border-slate-200 rounded-xl p-4 hover:border-blue-300 hover:shadow-sm transition-all text-center">
-        <p class="text-slate-900 font-semibold text-sm">Invoices</p>
-        <p class="text-slate-400 text-xs mt-0.5">Billing overview</p>
+      <a routerLink="/riders" class="nf-telemetry-card nf-fade-in">
+        <div class="nf-telemetry-card__header">
+          <span class="material-icons-round nf-telemetry-card__icon">two_wheeler</span>
+          <span class="nf-telemetry-card__label">RIDERS</span>
+        </div>
+        <p class="nf-telemetry-card__value">{{ riders() }}</p>
+        <span class="nf-telemetry-card__link">View all →</span>
       </a>
     </div>
   </div>
+
+  <!-- ── Quick Actions ── -->
+  <div class="nf-section nf-fade-in">
+    <h3 class="nf-section__title">Quick Actions</h3>
+    <div class="nf-quick-grid nf-stagger">
+      <a routerLink="/orders" class="nf-quick-card nf-fade-in">
+        <span class="material-icons-round nf-quick-card__icon">add_shopping_cart</span>
+        <p class="nf-quick-card__title">New Order</p>
+        <p class="nf-quick-card__desc">Place an order</p>
+      </a>
+      <a routerLink="/shipments" class="nf-quick-card nf-fade-in">
+        <span class="material-icons-round nf-quick-card__icon">local_shipping</span>
+        <p class="nf-quick-card__title">Shipments</p>
+        <p class="nf-quick-card__desc">Track deliveries</p>
+      </a>
+      <a routerLink="/returns" class="nf-quick-card nf-fade-in">
+        <span class="material-icons-round nf-quick-card__icon">assignment_return</span>
+        <p class="nf-quick-card__title">Returns</p>
+        <p class="nf-quick-card__desc">Manage returns</p>
+      </a>
+      <a routerLink="/invoices" class="nf-quick-card nf-fade-in">
+        <span class="material-icons-round nf-quick-card__icon">receipt_long</span>
+        <p class="nf-quick-card__title">Invoices</p>
+        <p class="nf-quick-card__desc">Billing overview</p>
+      </a>
+    </div>
+  </div>
+
 </div>

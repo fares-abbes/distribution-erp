@@ -3,24 +3,26 @@ import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { ProductService } from '../../core/services/product.service';
 import { MerchantService } from '../../core/services/merchant.service';
+import { InventoryService } from '../../core/services/inventory.service';
 import { ToastService } from '../../shared/toast.service';
 import { Product, Merchant } from '../../core/models';
-import { BadgeComponent } from '../../shared/badge';
 
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [ReactiveFormsModule, BadgeComponent, DecimalPipe],
+  imports: [ReactiveFormsModule, DecimalPipe],
   templateUrl: './products.html',
 })
 export class ProductsComponent implements OnInit {
   private svc = inject(ProductService);
   private merchantSvc = inject(MerchantService);
+  private invSvc = inject(InventoryService);
   private fb = inject(FormBuilder);
   private toast = inject(ToastService);
 
   items = signal<Product[]>([]);
   merchants = signal<Merchant[]>([]);
+  stockTotals = signal<Record<number, number>>({});
   loading = signal(false);
   showModal = signal(false);
   editingId = signal<number | null>(null);
@@ -34,18 +36,20 @@ export class ProductsComponent implements OnInit {
     purchasePrice: [0],
     salePrice: [0],
     weight: [0],
-    stockQuantity: [0, [Validators.required, Validators.min(0)]],
     minStockLevel: [0],
     merchantId: [null as number | null],
     isFragile: [false],
+    imageUrl: [''],
   });
 
   ngOnInit() {
     this.load();
     this.merchantSvc.getAll().subscribe(d => this.merchants.set(d));
+    this.invSvc.getAllTotals().subscribe(d => this.stockTotals.set(d));
   }
   load() { this.loading.set(true); this.svc.getAll().subscribe({ next: d => { this.items.set(d); this.loading.set(false); }, error: () => this.loading.set(false) }); }
-  openCreate() { this.editingId.set(null); this.form.reset({ purchasePrice: 0, salePrice: 0, weight: 0, stockQuantity: 0, minStockLevel: 0, isFragile: false }); this.showModal.set(true); }
+  totalStock(productId: number) { return this.stockTotals()[productId] ?? 0; }
+  openCreate() { this.editingId.set(null); this.form.reset({ purchasePrice: 0, salePrice: 0, weight: 0, minStockLevel: 0, isFragile: false }); this.showModal.set(true); }
   openEdit(item: Product) { this.editingId.set(item.id); this.form.patchValue({ ...item, isFragile: item.fragile }); this.showModal.set(true); }
   close() { this.showModal.set(false); }
   save() {
@@ -59,4 +63,5 @@ export class ProductsComponent implements OnInit {
   }
   merchantName(id?: number) { return this.merchants().find(m => m.id === id)?.storeName ?? '-'; }
   err(f: string) { const c = this.form.get(f); return c?.invalid && c?.touched; }
+  onImgError(e: Event) { (e.target as HTMLImageElement).style.display = 'none'; }
 }

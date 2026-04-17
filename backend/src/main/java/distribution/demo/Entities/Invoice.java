@@ -1,6 +1,7 @@
 package distribution.demo.Entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Transient;
 import distribution.demo.Enums.InvoiceStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -44,11 +45,12 @@ public class Invoice {
     @Column(nullable = false)
     private InvoiceStatus status;
 
+    @Getter(onMethod_ = {@JsonIgnore})
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "merchant_id", nullable = false)
-    @JsonIgnore
     private Merchant merchant;
 
+    @Transient
     public Long getMerchantId() {
         return merchant != null ? merchant.getId() : null;
     }

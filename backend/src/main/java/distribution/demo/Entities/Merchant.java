@@ -1,5 +1,6 @@
 package distribution.demo.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -37,10 +38,12 @@ public class Merchant {
     private Double commissionRate; // % per delivery or sale
 
     // Relationship with Products
+    @Getter(onMethod_ = {@JsonIgnore})
     @OneToMany(mappedBy = "merchant", cascade = CascadeType.ALL)
     private List<Product> products;
 
     // Relationship with Clients
+    @Getter(onMethod_ = {@JsonIgnore})
     @OneToMany(mappedBy = "merchant", cascade = CascadeType.ALL)
     private List<Client> clients;
 

@@ -17,14 +17,14 @@ public class ReturnService {
 
     private final ReturnOrderRepository returnOrderRepository;
     private final ShipmentRepository shipmentRepository;
-    private final ProductRepository productRepository;
+    private final InventoryService inventoryService;
 
     public ReturnService(ReturnOrderRepository returnOrderRepository,
                          ShipmentRepository shipmentRepository,
-                         ProductRepository productRepository) {
+                         InventoryService inventoryService) {
         this.returnOrderRepository = returnOrderRepository;
         this.shipmentRepository = shipmentRepository;
-        this.productRepository = productRepository;
+        this.inventoryService = inventoryService;
     }
 
     public ReturnOrder getReturnOrderById(Long id) {
@@ -57,9 +57,7 @@ public class ReturnService {
             Order order = shipment.getOrder();
             if (order != null) {
                 for (OrderItem item : order.getOrderItems()) {
-                    Product product = item.getProduct();
-                    product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
-                    productRepository.save(product);
+                    inventoryService.restoreStock(item.getProduct().getId(), item.getQuantity());
                 }
             }
         }

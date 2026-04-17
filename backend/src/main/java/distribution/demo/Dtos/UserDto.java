@@ -12,10 +12,11 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class UserDto {
+
     @NotBlank
     private String username;
 
-    @NotBlank
+    // Required on create, optional on update (blank = keep existing)
     private String password;
 
     @NotBlank
@@ -29,5 +30,13 @@ public class UserDto {
     @NotNull
     private UserRole role;
 
-    private Long merchantRecordId;
+    // --- RIDER role fields ---
+    private Long vehicleId;
+
+    // --- MERCHANT role fields ---
+    private String storeName;
+    private Double commissionRate;
+    private String taxId;
+    private String address;
+    private String websiteUrl;
 }

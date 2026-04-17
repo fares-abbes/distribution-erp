@@ -41,29 +41,41 @@ public class Order {
 
     private BigDecimal codAmount;
 
+    @Getter(onMethod_ = {@JsonIgnore})
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id")
-    @JsonIgnore
     private Client client;
 
+    @Getter(onMethod_ = {@JsonIgnore})
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "merchant_id")
-    @JsonIgnore
     private Merchant merchant;
+
+    @Getter(onMethod_ = {@JsonIgnore})
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "warehouse_id")
+    private Warehouse warehouse;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference("order-items")
     private List<OrderItem> orderItems = new ArrayList<>();
 
+    @Getter(onMethod_ = {@JsonIgnore})
     @OneToOne(mappedBy = "order", fetch = FetchType.LAZY)
-    @JsonIgnore
     private Shipment shipment;
 
+    @Transient
     public Long getClientId() {
         return client != null ? client.getId() : null;
     }
 
+    @Transient
     public Long getMerchantId() {
         return merchant != null ? merchant.getId() : null;
+    }
+
+    @Transient
+    public Long getWarehouseId() {
+        return warehouse != null ? warehouse.getId() : null;
     }
 }

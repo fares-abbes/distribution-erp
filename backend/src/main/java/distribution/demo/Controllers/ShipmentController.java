@@ -55,4 +55,10 @@ public class ShipmentController {
     public ResponseEntity<List<Shipment>> getShipmentsByRider(@PathVariable Long riderId) {
         return ResponseEntity.ok(shipmentService.getShipmentsByRider(riderId));
     }
+
+    @GetMapping("/my-shipments")
+    @PreAuthorize("hasRole('RIDER')")
+    public ResponseEntity<List<Shipment>> getMyShipments() {
+        return ResponseEntity.ok(shipmentService.getMyShipments());
+    }
 }

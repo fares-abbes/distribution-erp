@@ -1,0 +1,239 @@
+<div class="nf-page">
+
+  <!-- Page header -->
+  <div class="nf-page-head">
+    <div>
+      <h1 class="nf-page-title">Warehouses</h1>
+      <p class="nf-page-subtitle">Manage storage locations and their inventory levels</p>
+    </div>
+  </div>
+
+  <!-- Content card -->
+  <div class="nf-card">
+    <div class="nf-card-head">
+      <div class="nf-toolbar"></div>
+      <div class="nf-toolbar">
+        <button (click)="openCreate()" class="nf-btn-primary">
+          + Add Warehouse
+        </button>
+      </div>
+    </div>
+
+    @if (loading()) {
+      <div class="nf-loading"><div class="nf-spinner"></div></div>
+    } @else if (items().length === 0) {
+      <div class="nf-empty">No warehouses found.</div>
+    } @else {
+      <div style="overflow-x:auto;">
+        <table class="nf-table">
+          <thead>
+            <tr>
+              <th>Warehouse</th>
+              <th>City</th>
+              <th>Address</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of items(); track item.id) {
+              <tr>
+                <td>
+                  <div class="nf-cell-stack">
+                    <div style="width:36px;height:36px;border-radius:8px;background:var(--surface-container);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                      <span class="material-icons-round" style="font-size:18px;color:var(--on-surface-variant);">warehouse</span>
+                    </div>
+                    <div class="nf-cell-stack-text">
+                      <span class="top">{{ item.name }}</span>
+                      <span class="sub">#{{ item.id }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <span class="material-icons-round" style="font-size:15px;color:var(--on-surface-variant);">location_on</span>
+                    {{ item.city }}
+                  </div>
+                </td>
+                <td class="cell-muted">{{ item.address || '—' }}</td>
+                <td>
+                  @if (item.active) {
+                    <span class="nf-status ok">Active</span>
+                  } @else {
+                    <span class="nf-status danger">Inactive</span>
+                  }
+                </td>
+                <td>
+                  <div class="row-actions">
+                    <button (click)="viewStock(item)" class="nf-btn-icon" title="Manage Stock">
+                      <span class="material-icons-round">inventory</span>
+                    </button>
+                    <button (click)="openEdit(item)" class="nf-btn-icon" title="Edit">
+                      <span class="material-icons-round">edit</span>
+                    </button>
+                    <button (click)="delete(item.id)" class="nf-btn-icon danger" title="Delete">
+                      <span class="material-icons-round">delete</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="nf-table-footer">
+        <p class="nf-table-footer-text">Showing {{ items().length }} warehouses</p>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Create / Edit Warehouse Modal -->
+@if (showModal()) {
+  <div class="nf-modal-overlay">
+    <div class="absolute inset-0" (click)="close()"></div>
+    <div class="nf-modal">
+      <div class="nf-modal-head">
+        <div>
+          <span class="nf-modal-eyebrow">{{ editingId() ? 'Editing record' : 'New location' }}</span>
+          <h3 class="nf-modal-title">{{ editingId() ? 'Edit Warehouse' : 'New Warehouse' }}</h3>
+        </div>
+        <button (click)="close()" class="nf-btn-icon" title="Close">
+          <span class="material-icons-round">close</span>
+        </button>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="save()">
+        <div class="nf-modal-body">
+          <div class="nf-form-section">
+            <span class="nf-form-section-label">Location Details</span>
+            <div class="nf-field">
+              <label>Warehouse Name *</label>
+              <input formControlName="name" type="text" placeholder="Monastir Central"
+                     [class.border-red-400]="err('name')">
+            </div>
+            <div class="nf-field-row">
+              <div class="nf-field">
+                <label>City *</label>
+                <input formControlName="city" type="text" placeholder="Monastir"
+                       [class.border-red-400]="err('city')">
+              </div>
+              <div class="nf-field">
+                <label>Address</label>
+                <input formControlName="address" type="text" placeholder="Street, building...">
+              </div>
+            </div>
+            <label class="nf-checkbox-row">
+              <input formControlName="active" type="checkbox">
+              <span>Active — warehouse is operational</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="nf-modal-foot">
+          <button type="button" (click)="close()" class="nf-btn-ghost">Cancel</button>
+          <button type="submit" class="nf-btn-primary">
+            <span class="material-icons-round">save</span>
+            Save Warehouse
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Stock Management Modal -->
+@if (showStockModal()) {
+  <div class="nf-modal-overlay">
+    <div class="absolute inset-0" (click)="closeStock()"></div>
+    <div class="nf-modal lg">
+      <div class="nf-modal-head">
+        <div>
+          <span class="nf-modal-eyebrow">Inventory Management</span>
+          <h3 class="nf-modal-title">{{ selectedWarehouse()?.name }} · {{ selectedWarehouse()?.city }}</h3>
+        </div>
+        <button (click)="closeStock()" class="nf-btn-icon" title="Close">
+          <span class="material-icons-round">close</span>
+        </button>
+      </div>
+
+      <div class="nf-modal-body">
+
+        <!-- Add / set stock form -->
+        <div class="nf-form-section">
+          <span class="nf-form-section-label">Set Stock</span>
+          <p style="font-size:0.8rem;color:var(--on-surface-variant);margin-bottom:12px;">
+            Select a product and enter the exact quantity at this warehouse. This creates or overwrites the current stock level.
+          </p>
+          <form [formGroup]="stockForm" (ngSubmit)="setStock()">
+            <div class="nf-field-row">
+              <div class="nf-field" style="flex:2;">
+                <label>Product *</label>
+                <select formControlName="productId" [class.border-red-400]="stockErr('productId')">
+                  <option [ngValue]="null">Select product…</option>
+                  @for (p of products(); track p.id) {
+                    <option [ngValue]="p.id">{{ p.name }} ({{ p.sku }})</option>
+                  }
+                </select>
+              </div>
+              <div class="nf-field" style="flex:1;">
+                <label>Quantity *</label>
+                <input formControlName="quantity" type="number" min="0" placeholder="0"
+                       [class.border-red-400]="stockErr('quantity')">
+              </div>
+              <div class="nf-field" style="flex:0;align-self:flex-end;">
+                <button type="submit" class="nf-btn-primary" [disabled]="stockSaving()">
+                  <span class="material-icons-round">add</span>
+                  {{ stockSaving() ? 'Saving…' : 'Set' }}
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Current stock table -->
+        <div class="nf-form-section">
+          <span class="nf-form-section-label">Current Stock</span>
+          @if (stockLoading()) {
+            <div class="nf-loading"><div class="nf-spinner"></div></div>
+          } @else if (stockRows().length === 0) {
+            <div class="nf-empty" style="padding:16px 0;">No stock records yet. Use the form above to add products.</div>
+          } @else {
+            <table class="nf-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th class="right">Quantity</th>
+                  <th>Last Updated</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of stockRows(); track row.id) {
+                  <tr>
+                    <td>{{ productName(row.productId) }}</td>
+                    <td class="cell-num">
+                      @if (row.quantity <= 0) {
+                        <span class="nf-status danger">{{ row.quantity }} units</span>
+                      } @else if (row.quantity <= 5) {
+                        <span class="nf-status warn">{{ row.quantity }} units</span>
+                      } @else {
+                        <span class="nf-status ok">{{ row.quantity }} units</span>
+                      }
+                    </td>
+                    <td class="cell-muted">{{ row.lastUpdated ? (row.lastUpdated | slice:0:10) : '—' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+
+      </div>
+
+      <div class="nf-modal-foot">
+        <button type="button" (click)="closeStock()" class="nf-btn-ghost">Close</button>
+      </div>
+    </div>
+  </div>
+}

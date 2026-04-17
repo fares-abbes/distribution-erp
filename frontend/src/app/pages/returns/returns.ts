@@ -5,12 +5,11 @@ import { ReturnService } from '../../core/services/return.service';
 import { MerchantService } from '../../core/services/merchant.service';
 import { ToastService } from '../../shared/toast.service';
 import { ReturnOrder, Merchant, ReturnReason } from '../../core/models';
-import { BadgeComponent } from '../../shared/badge';
 
 @Component({
   selector: 'app-returns',
   standalone: true,
-  imports: [ReactiveFormsModule, BadgeComponent, DatePipe],
+  imports: [ReactiveFormsModule, DatePipe],
   templateUrl: './returns.html',
 })
 export class ReturnsComponent implements OnInit {

@@ -24,11 +24,18 @@ public class Rider {
     @Column(nullable = false)
     private String phone;
 
-    private String vehicleType;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "vehicle_id")
+    private Vehicle vehicle;
 
     private boolean active = true;
 
+    @Transient
+    public Long getVehicleId() {
+        return vehicle != null ? vehicle.getId() : null;
+    }
+
+    @Getter(onMethod_ = {@JsonIgnore})
     @OneToMany(mappedBy = "rider")
-    @JsonIgnore
     private List<Shipment> shipments;
 }

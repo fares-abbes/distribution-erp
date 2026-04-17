@@ -27,4 +27,6 @@ public class OrderDto {
     private OrderPaymentMethod paymentMethod = OrderPaymentMethod.PREPAID;
 
     private BigDecimal codAmount;
+
+    private Long warehouseId;
 }

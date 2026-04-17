@@ -1,43 +1,66 @@
 import { Component, Input } from '@angular/core';
 
-const STATUS_CLASSES: Record<string, string> = {
-  DRAFT: 'bg-slate-100 text-slate-600',
-  CONFIRMED: 'bg-blue-50 text-blue-700',
-  CANCELLED: 'bg-red-50 text-red-600',
-  READY_FOR_PICKUP: 'bg-amber-50 text-amber-700',
-  PENDING: 'bg-orange-50 text-orange-700',
-  IN_TRANSIT: 'bg-indigo-50 text-indigo-700',
-  DELIVERED: 'bg-green-50 text-green-700',
-  RETURNED: 'bg-red-50 text-red-600',
-  PAID: 'bg-green-50 text-green-700',
-  SENT: 'bg-blue-50 text-blue-700',
-  PREPAID: 'bg-slate-100 text-slate-600',
-  COD: 'bg-purple-50 text-purple-700',
-  REFUSED: 'bg-red-50 text-red-600',
-  NOT_FOUND: 'bg-orange-50 text-orange-700',
-  DAMAGED: 'bg-red-50 text-red-600',
-  ADMIN: 'bg-slate-800 text-white',
-  MANAGER: 'bg-blue-50 text-blue-700',
-  DISPATCHER: 'bg-indigo-50 text-indigo-700',
-  RIDER: 'bg-green-50 text-green-700',
-  MERCHANT: 'bg-purple-50 text-purple-700',
-  WAREHOUSE: 'bg-orange-50 text-orange-700',
-  service: 'bg-sky-50 text-sky-700',
-  article: 'bg-teal-50 text-teal-700',
+const STATUS_CLASSES: Record<string, { bg: string; text: string; glow?: string }> = {
+  // Order / general
+  DRAFT:            { bg: 'rgba(195, 198, 208, 0.08)', text: '#c3c6d0' },
+  CONFIRMED:        { bg: 'rgba(169, 200, 252, 0.10)', text: '#a9c8fc' },
+  CANCELLED:        { bg: 'rgba(255, 180, 171, 0.10)', text: '#ffb4ab' },
+  READY_FOR_PICKUP: { bg: 'rgba(255, 200, 120, 0.10)', text: '#ffc878' },
+  PENDING:          { bg: 'rgba(255, 200, 120, 0.10)', text: '#ffc878' },
+  IN_TRANSIT:       { bg: 'rgba(169, 200, 252, 0.12)', text: '#a9c8fc', glow: 'rgba(169,200,252,0.15)' },
+  DELIVERED:        { bg: 'rgba(96, 220, 178, 0.10)', text: '#60dcb2', glow: 'rgba(96,220,178,0.1)' },
+  RETURNED:         { bg: 'rgba(255, 180, 171, 0.10)', text: '#ffb4ab' },
+  PAID:             { bg: 'rgba(96, 220, 178, 0.10)', text: '#60dcb2', glow: 'rgba(96,220,178,0.1)' },
+  SENT:             { bg: 'rgba(169, 200, 252, 0.10)', text: '#a9c8fc' },
+  // Payment methods
+  PREPAID:          { bg: 'rgba(195, 198, 208, 0.08)', text: '#c3c6d0' },
+  COD:              { bg: 'rgba(198, 196, 223, 0.12)', text: '#c6c4df' },
+  // Returns
+  REFUSED:          { bg: 'rgba(255, 180, 171, 0.10)', text: '#ffb4ab' },
+  NOT_FOUND:        { bg: 'rgba(255, 200, 120, 0.10)', text: '#ffc878' },
+  DAMAGED:          { bg: 'rgba(255, 180, 171, 0.10)', text: '#ffb4ab' },
+  // Roles
+  ADMIN:            { bg: 'rgba(169, 200, 252, 0.15)', text: '#a9c8fc' },
+  MANAGER:          { bg: 'rgba(169, 200, 252, 0.10)', text: '#a9c8fc' },
+  DISPATCHER:       { bg: 'rgba(198, 196, 223, 0.12)', text: '#c6c4df' },
+  RIDER:            { bg: 'rgba(96, 220, 178, 0.10)', text: '#60dcb2' },
+  MERCHANT:         { bg: 'rgba(198, 196, 223, 0.12)', text: '#c6c4df' },
+  WAREHOUSE:        { bg: 'rgba(255, 200, 120, 0.10)', text: '#ffc878' },
+  // Types
+  service:          { bg: 'rgba(169, 200, 252, 0.10)', text: '#a9c8fc' },
+  article:          { bg: 'rgba(96, 220, 178, 0.10)', text: '#60dcb2' },
 };
+
+const DEFAULT_STYLE = { bg: 'rgba(195, 198, 208, 0.08)', text: '#c3c6d0' };
 
 @Component({
   selector: 'app-badge',
   standalone: true,
   template: `
-    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ badgeClass }}">
+    <span class="nf-badge"
+          [style.background]="style.bg"
+          [style.color]="style.text"
+          [style.box-shadow]="style.glow ? '0 0 8px 1px ' + style.glow : 'none'">
       {{ value }}
     </span>
   `,
+  styles: [`
+    .nf-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+  `],
 })
 export class BadgeComponent {
   @Input() value = '';
-  get badgeClass(): string {
-    return STATUS_CLASSES[this.value] ?? 'bg-slate-100 text-slate-600';
+  get style() {
+    return STATUS_CLASSES[this.value] ?? DEFAULT_STYLE;
   }
 }

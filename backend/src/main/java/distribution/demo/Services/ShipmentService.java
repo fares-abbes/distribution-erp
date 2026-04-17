@@ -6,9 +6,11 @@ import distribution.demo.Enums.OrderPaymentMethod;
 import distribution.demo.Enums.PaymentMethod;
 import distribution.demo.Enums.PaymentStatus;
 import distribution.demo.Enums.ShipmentStatus;
+import distribution.demo.Entities.User;
 import distribution.demo.Repositories.PaymentRepository;
 import distribution.demo.Repositories.RiderRepository;
 import distribution.demo.Repositories.ShipmentRepository;
+import distribution.demo.Repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,13 +29,16 @@ public class ShipmentService {
     private final ShipmentRepository shipmentRepository;
     private final RiderRepository riderRepository;
     private final PaymentRepository paymentRepository;
+    private final UserRepository userRepository;
 
     public ShipmentService(ShipmentRepository shipmentRepository,
                            RiderRepository riderRepository,
-                           PaymentRepository paymentRepository) {
+                           PaymentRepository paymentRepository,
+                           UserRepository userRepository) {
         this.shipmentRepository = shipmentRepository;
         this.riderRepository = riderRepository;
         this.paymentRepository = paymentRepository;
+        this.userRepository = userRepository;
     }
 
     public Shipment getShipmentById(Long id) {
@@ -110,6 +115,26 @@ public class ShipmentService {
 
     public List<Shipment> getShipmentsByRider(Long riderId) {
         return shipmentRepository.findByRider_Id(riderId);
+    }
+
+    /**
+     * Returns shipments assigned to the currently authenticated RIDER user.
+     * Resolves the rider via the User record linked to the JWT username.
+     */
+    public List<Shipment> getMyShipments() {
+        String username = resolveCurrentUsername();
+        User user = userRepository.findByUsernameAndActiveTrue(username)
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException(
+                        "No app user record found for username: " + username +
+                        ". Ask an admin to create your user account in the system."));
+
+        if (user.getRiderRecord() == null) {
+            throw new jakarta.persistence.EntityNotFoundException(
+                    "No rider profile linked to user '" + username +
+                    "'. Ask an admin to link your account to a rider profile.");
+        }
+
+        return shipmentRepository.findByRider_Id(user.getRiderRecord().getId());
     }
 
     private String resolveCurrentUsername() {

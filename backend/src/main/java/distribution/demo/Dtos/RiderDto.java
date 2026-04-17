@@ -15,5 +15,5 @@ public class RiderDto {
     @NotBlank
     private String phone;
 
-    private String vehicleType;
+    private Long vehicleId;
 }

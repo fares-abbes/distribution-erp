@@ -3,12 +3,11 @@ import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { MerchantService } from '../../core/services/merchant.service';
 import { ToastService } from '../../shared/toast.service';
 import { Merchant } from '../../core/models';
-import { BadgeComponent } from '../../shared/badge';
 
 @Component({
   selector: 'app-merchants',
   standalone: true,
-  imports: [ReactiveFormsModule, BadgeComponent],
+  imports: [ReactiveFormsModule],
   templateUrl: './merchants.html',
 })
 export class MerchantsComponent implements OnInit {

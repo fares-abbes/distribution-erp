@@ -34,12 +34,12 @@ public class Zone {
 
     private boolean active = true;
 
+    @Getter(onMethod_ = {@JsonIgnore})
     @ManyToMany
     @JoinTable(
             name = "zone_riders",
             joinColumns = @JoinColumn(name = "zone_id"),
             inverseJoinColumns = @JoinColumn(name = "rider_id")
     )
-    @JsonIgnore
     private List<Rider> riders;
 }

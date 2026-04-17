@@ -9,6 +9,7 @@ export class ShipmentService {
   private base = `${API_URL}/shipments`;
 
   getAll() { return this.http.get<Shipment[]>(this.base); }
+  getMyShipments() { return this.http.get<Shipment[]>(`${this.base}/my-shipments`); }
   getById(id: number) { return this.http.get<Shipment>(`${this.base}/${id}`); }
   getByTracking(trackingNumber: string) { return this.http.get<Shipment>(`${this.base}/tracking/${trackingNumber}`); }
   getByRider(riderId: number) { return this.http.get<Shipment[]>(`${this.base}/rider/${riderId}`); }

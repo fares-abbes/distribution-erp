@@ -1,6 +1,5 @@
 package distribution.demo.Dtos;
 
-import distribution.demo.Enums.productType;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -24,7 +23,7 @@ public class ProductDto {
     private String name;
 
     private String description;
-    private productType type;
+    private String type;
 
     @DecimalMin("0.0")
     private BigDecimal purchasePrice;
@@ -36,14 +35,11 @@ public class ProductDto {
     private Double volume;
     private String dimensions;
 
-    @NotNull
-    @Min(0)
-    private Integer stockQuantity;
-
     @Min(0)
     private Integer minStockLevel;
 
     private Long merchantId;
     private BigDecimal declaredValue;
     private boolean isFragile;
+    private String imageUrl;
 }

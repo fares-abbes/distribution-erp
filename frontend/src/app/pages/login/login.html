@@ -1,119 +1,97 @@
-<div class="min-h-screen flex">
+<div class="nf-login">
 
   <!-- Left Panel — Brand -->
-  <div class="hidden lg:flex lg:w-5/12 xl:w-2/5 flex-col justify-between bg-slate-900 p-12 relative overflow-hidden">
+  <div class="nf-login__brand">
 
     <!-- Background decoration -->
-    <div class="absolute inset-0 opacity-5">
-      <div class="absolute top-0 right-0 w-96 h-96 rounded-full bg-blue-400 -translate-y-1/2 translate-x-1/2"></div>
-      <div class="absolute bottom-0 left-0 w-80 h-80 rounded-full bg-orange-400 translate-y-1/2 -translate-x-1/2"></div>
+    <div class="nf-login__bg-decor">
+      <div class="nf-login__orb nf-login__orb--blue"></div>
+      <div class="nf-login__orb nf-login__orb--emerald"></div>
     </div>
 
-    <div class="relative z-10">
+    <div class="nf-login__brand-content">
       <!-- Logo -->
-      <div class="flex items-center gap-3 mb-16">
-        <div class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
-          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10l2 2h10l2-2zM13 7h3l3 4v2h-6V7z" />
-          </svg>
+      <div class="nf-login__logo">
+        <div class="nf-login__logo-icon">
+          <span class="material-icons-round" style="font-size: 24px; color: var(--on-primary);">bolt</span>
         </div>
-        <span class="text-white font-bold text-xl tracking-tight">DistribERP</span>
+        <span class="nf-login__logo-text">NexFlow ERP</span>
       </div>
 
       <!-- Headline -->
-      <h1 class="text-4xl font-bold text-white leading-tight mb-4">
-        Manage your <span class="text-orange-400">delivery</span> operations end‑to‑end
+      <h1 class="nf-login__headline">
+        Your <span class="nf-login__headline-accent">distribution</span> command center
       </h1>
-      <p class="text-slate-400 text-base leading-relaxed mb-12">
-        From order creation to last-mile delivery — one platform for your entire distribution workflow.
+      <p class="nf-login__subtitle">
+        From order creation to last-mile delivery — one platform for your entire logistics workflow.
       </p>
 
       <!-- Feature list -->
-      <ul class="space-y-4">
-        <li class="flex items-center gap-3">
-          <span class="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center flex-shrink-0">
-            <svg class="w-3.5 h-3.5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-            </svg>
+      <ul class="nf-login__features">
+        <li class="nf-login__feature">
+          <span class="nf-login__feature-icon">
+            <span class="material-icons-round" style="font-size: 14px; color: var(--tertiary);">check</span>
           </span>
-          <span class="text-slate-300 text-sm">Order & shipment lifecycle management</span>
+          <span>Order &amp; shipment lifecycle management</span>
         </li>
-        <li class="flex items-center gap-3">
-          <span class="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center flex-shrink-0">
-            <svg class="w-3.5 h-3.5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-            </svg>
+        <li class="nf-login__feature">
+          <span class="nf-login__feature-icon">
+            <span class="material-icons-round" style="font-size: 14px; color: var(--tertiary);">check</span>
           </span>
-          <span class="text-slate-300 text-sm">Real-time rider assignment & tracking</span>
+          <span>Real-time rider assignment &amp; tracking</span>
         </li>
-        <li class="flex items-center gap-3">
-          <span class="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center flex-shrink-0">
-            <svg class="w-3.5 h-3.5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-            </svg>
+        <li class="nf-login__feature">
+          <span class="nf-login__feature-icon">
+            <span class="material-icons-round" style="font-size: 14px; color: var(--tertiary);">check</span>
           </span>
-          <span class="text-slate-300 text-sm">Merchant billing & invoice generation</span>
+          <span>Merchant billing &amp; invoice generation</span>
         </li>
-        <li class="flex items-center gap-3">
-          <span class="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center flex-shrink-0">
-            <svg class="w-3.5 h-3.5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-            </svg>
+        <li class="nf-login__feature">
+          <span class="nf-login__feature-icon">
+            <span class="material-icons-round" style="font-size: 14px; color: var(--tertiary);">check</span>
           </span>
-          <span class="text-slate-300 text-sm">Role-based access for every team member</span>
+          <span>Role-based access for every team member</span>
         </li>
       </ul>
     </div>
 
     <!-- Footer -->
-    <div class="relative z-10">
-      <p class="text-slate-600 text-xs">© 2025 DistribERP. All rights reserved.</p>
+    <div class="nf-login__footer">
+      <p>© 2025 NexFlow ERP. All rights reserved.</p>
     </div>
   </div>
 
   <!-- Right Panel — Sign In -->
-  <div class="flex-1 flex items-center justify-center bg-slate-50 p-8">
-    <div class="w-full max-w-md">
+  <div class="nf-login__form-panel">
+    <div class="nf-login__form-wrapper">
 
       <!-- Mobile logo -->
-      <div class="flex items-center gap-3 mb-10 lg:hidden">
-        <div class="w-9 h-9 bg-orange-500 rounded-lg flex items-center justify-center">
-          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10l2 2h10l2-2zM13 7h3l3 4v2h-6V7z" />
-          </svg>
+      <div class="nf-login__mobile-logo">
+        <div class="nf-login__logo-icon">
+          <span class="material-icons-round" style="font-size: 20px; color: var(--on-primary);">bolt</span>
         </div>
-        <span class="text-slate-900 font-bold text-xl">DistribERP</span>
+        <span class="nf-login__logo-text">NexFlow ERP</span>
       </div>
 
       <!-- Card -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+      <div class="nf-login__card">
 
-        <div class="mb-8">
-          <h2 class="text-2xl font-bold text-slate-900 mb-2">Welcome back</h2>
-          <p class="text-slate-500 text-sm">Sign in to access your workspace</p>
+        <div class="nf-login__card-header">
+          <h2 class="nf-login__card-title">Welcome back</h2>
+          <p class="nf-login__card-desc">Sign in to access your command center</p>
         </div>
 
         <!-- SSO Sign In Button -->
         <button
           (click)="login()"
-          class="w-full flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 active:bg-blue-800
-                 text-white font-semibold py-3 px-6 rounded-xl transition-colors duration-150 text-sm cursor-pointer">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-          </svg>
+          class="nf-login__sso-btn">
+          <span class="material-icons-round" style="font-size: 20px;">vpn_key</span>
           Sign in with SSO
         </button>
 
         <!-- Divider info -->
-        <div class="mt-6 pt-6 border-t border-slate-100">
-          <p class="text-xs text-slate-400 text-center leading-relaxed">
+        <div class="nf-login__info">
+          <p>
             You will be redirected to your organisation's<br />
             identity provider to complete sign in.
           </p>
@@ -122,12 +100,9 @@
       </div>
 
       <!-- Keycloak badge -->
-      <div class="mt-6 flex items-center justify-center gap-2">
-        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-        </svg>
-        <span class="text-xs text-slate-400">Secured by <span class="font-medium text-slate-500">Keycloak</span></span>
+      <div class="nf-login__secured">
+        <span class="material-icons-round" style="font-size: 16px;">lock</span>
+        <span>Secured by <strong>Keycloak</strong></span>
       </div>
 
     </div>

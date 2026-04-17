@@ -5,12 +5,11 @@ import { PaymentService } from '../../core/services/payment.service';
 import { MerchantService } from '../../core/services/merchant.service';
 import { ToastService } from '../../shared/toast.service';
 import { Payment, Merchant, PaymentMethod, PaymentStatus } from '../../core/models';
-import { BadgeComponent } from '../../shared/badge';
 
 @Component({
   selector: 'app-payments',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, BadgeComponent, DatePipe, DecimalPipe],
+  imports: [ReactiveFormsModule, CommonModule, DatePipe, DecimalPipe],
   templateUrl: './payments.html',
 })
 export class PaymentsComponent implements OnInit {

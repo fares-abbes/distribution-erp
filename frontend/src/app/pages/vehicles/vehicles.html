@@ -1,0 +1,156 @@
+<div class="nf-page">
+
+  <!-- Page header -->
+  <div class="nf-page-head">
+    <div>
+      <h1 class="nf-page-title">Fleet Management</h1>
+      <p class="nf-page-subtitle">Register and manage all delivery vehicles</p>
+    </div>
+  </div>
+
+  <!-- Content card -->
+  <div class="nf-card">
+    <!-- Table Controls -->
+    <div class="nf-card-head">
+      <div class="nf-toolbar">
+        <select class="nf-filter">
+          <option>Type: All</option>
+          @for (t of vehicleTypes; track t) {
+            <option>{{ t }}</option>
+          }
+        </select>
+      </div>
+      <div class="nf-toolbar">
+        <button (click)="openCreate()" class="nf-btn-primary">
+          + Add Vehicle
+        </button>
+      </div>
+    </div>
+
+    @if (loading()) {
+      <div class="nf-loading"><div class="nf-spinner"></div></div>
+    } @else if (items().length === 0) {
+      <div class="nf-empty">No vehicles found. Add your first vehicle.</div>
+    } @else {
+      <!-- Table -->
+      <div style="overflow-x:auto;">
+        <table class="nf-table">
+          <thead>
+            <tr>
+              <th>Plate</th>
+              <th>Type</th>
+              <th>Brand / Model</th>
+              <th>Year</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of items(); track item.id) {
+              <tr>
+                <td><span class="nf-chip-mono">{{ item.plateNumber }}</span></td>
+                <td>
+                  <span class="nf-status info">{{ item.type }}</span>
+                </td>
+                <td>
+                  @if (item.brand || item.model) {
+                    <span>{{ item.brand }}{{ item.brand && item.model ? ' ' : '' }}{{ item.model }}</span>
+                  } @else {
+                    <span style="color:var(--on-surface-variant)">—</span>
+                  }
+                </td>
+                <td>{{ item.year ?? '—' }}</td>
+                <td>
+                  <span class="nf-status" [class.ok]="item.active" [class.muted]="!item.active">
+                    {{ item.active ? 'Active' : 'Inactive' }}
+                  </span>
+                </td>
+                <td>
+                  <div class="row-actions">
+                    <button (click)="openEdit(item)" class="nf-btn-icon" title="Edit">
+                      <span class="material-icons-round">edit</span>
+                    </button>
+                    <button (click)="delete(item.id)" class="nf-btn-icon danger" title="Delete">
+                      <span class="material-icons-round">delete</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Table Footer -->
+      <div class="nf-table-footer">
+        <p class="nf-table-footer-text">Showing {{ items().length }} vehicles in fleet</p>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Modal -->
+@if (showModal()) {
+  <div class="nf-modal-overlay">
+    <div class="absolute inset-0" (click)="close()"></div>
+    <div class="nf-modal">
+      <div class="nf-modal-head">
+        <div>
+          <span class="nf-modal-eyebrow">{{ editingId() ? 'Editing record' : 'Register vehicle' }}</span>
+          <h3 class="nf-modal-title">{{ editingId() ? 'Edit Vehicle' : 'New Vehicle' }}</h3>
+        </div>
+        <button (click)="close()" class="nf-btn-icon" title="Close">
+          <span class="material-icons-round">close</span>
+        </button>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="save()">
+        <div class="nf-modal-body">
+
+          <div class="nf-form-section">
+            <span class="nf-form-section-label">Vehicle Identity</span>
+            <div class="nf-field">
+              <label>Plate Number *</label>
+              <input formControlName="plateNumber" type="text" placeholder="ABC-1234"
+                     [class.border-red-400]="err('plateNumber')">
+            </div>
+            <div class="nf-field">
+              <label>Type *</label>
+              <select formControlName="type" [class.border-red-400]="err('type')">
+                <option value="">Select type…</option>
+                @for (t of vehicleTypes; track t) {
+                  <option [value]="t">{{ t }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="nf-form-section">
+            <span class="nf-form-section-label">Details</span>
+            <div class="nf-field">
+              <label>Brand</label>
+              <input formControlName="brand" type="text" placeholder="e.g. Honda">
+            </div>
+            <div class="nf-field">
+              <label>Model</label>
+              <input formControlName="model" type="text" placeholder="e.g. CB500">
+            </div>
+            <div class="nf-field">
+              <label>Year</label>
+              <input formControlName="year" type="number" placeholder="e.g. 2023" min="1990" max="2100">
+            </div>
+          </div>
+
+        </div>
+
+        <div class="nf-modal-foot">
+          <button type="button" (click)="close()" class="nf-btn-ghost">Cancel</button>
+          <button type="submit" class="nf-btn-primary">
+            <span class="material-icons-round">save</span>
+            Save Vehicle
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

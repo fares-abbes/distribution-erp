@@ -5,15 +5,15 @@ import { OrderService } from '../../core/services/order.service';
 import { MerchantService } from '../../core/services/merchant.service';
 import { ClientService } from '../../core/services/client.service';
 import { ProductService } from '../../core/services/product.service';
+import { WarehouseService } from '../../core/services/warehouse.service';
 import { ToastService } from '../../shared/toast.service';
-import { Order, Merchant, Client, Product, OrderStatus } from '../../core/models';
-import { BadgeComponent } from '../../shared/badge';
+import { Order, Merchant, Client, Product, Warehouse, OrderStatus } from '../../core/models';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-orders',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, BadgeComponent, DatePipe, DecimalPipe],
+  imports: [ReactiveFormsModule, CommonModule, DatePipe, DecimalPipe],
   templateUrl: './orders.html',
 })
 export class OrdersComponent implements OnInit {
@@ -21,6 +21,7 @@ export class OrdersComponent implements OnInit {
   private merchantSvc = inject(MerchantService);
   private clientSvc = inject(ClientService);
   private productSvc = inject(ProductService);
+  private warehouseSvc = inject(WarehouseService);
   private fb = inject(FormBuilder);
   private toast = inject(ToastService);
   auth = inject(AuthService);
@@ -29,6 +30,7 @@ export class OrdersComponent implements OnInit {
   merchants = signal<Merchant[]>([]);
   clients = signal<Client[]>([]);
   products = signal<Product[]>([]);
+  warehouses = signal<Warehouse[]>([]);
   loading = signal(false);
   showModal = signal(false);
   showStatusModal = signal(false);
@@ -38,6 +40,7 @@ export class OrdersComponent implements OnInit {
   form = this.fb.group({
     clientId: [null as number | null, Validators.required],
     merchantId: [null as number | null, Validators.required],
+    warehouseId: [null as number | null, Validators.required],
     paymentMethod: ['PREPAID', Validators.required],
     codAmount: [null as number | null],
     items: this.fb.array([this.newItem()]),
@@ -61,6 +64,7 @@ export class OrdersComponent implements OnInit {
     this.merchantSvc.getAll().subscribe(d => this.merchants.set(d));
     this.clientSvc.getAll().subscribe(d => this.clients.set(d));
     this.productSvc.getAll().subscribe(d => this.products.set(d));
+    this.warehouseSvc.getAll().subscribe(d => this.warehouses.set(d));
   }
 
   load() {

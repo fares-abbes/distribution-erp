@@ -4,12 +4,11 @@ import { ClientService } from '../../core/services/client.service';
 import { MerchantService } from '../../core/services/merchant.service';
 import { ToastService } from '../../shared/toast.service';
 import { Client, Merchant } from '../../core/models';
-import { BadgeComponent } from '../../shared/badge';
 
 @Component({
   selector: 'app-clients',
   standalone: true,
-  imports: [ReactiveFormsModule, BadgeComponent],
+  imports: [ReactiveFormsModule],
   templateUrl: './clients.html',
 })
 export class ClientsComponent implements OnInit {
